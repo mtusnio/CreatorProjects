@@ -21,3 +21,11 @@ Check per project requirements.
 5. Once the image's been flashed create a symbolic link to work around the interpreter not working: ln -s ld-musl-mipsel-sf.so.1 ld-musl-mips.so.1
 
 ## Projects
+
+### Fan
+
+A simple C application which enables PWM fan control using a joystick
+
+### Temperature server
+
+Python HTTP server which reports temperature read from the Thermo3 click
