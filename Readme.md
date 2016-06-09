@@ -26,6 +26,10 @@ Check per project requirements.
 
 A simple C application which enables PWM fan control using a joystick
 
+[Video](https://drive.google.com/file/d/0B2-TjqGUlGKvSmNfLUF5TjRaNDQ/view?usp=sharing)
+
 ### Temperature server
 
 Python HTTP server which reports temperature read from the Thermo3 click
+
+[Video](https://drive.google.com/file/d/0B2-TjqGUlGKvYkxfVW9fX2tWcGs/view?usp=sharing)
