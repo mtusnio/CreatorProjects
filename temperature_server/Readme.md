@@ -10,4 +10,4 @@ Thermo3 click to be plugged into Mikrobus 1
 
 python server.py
 
-Then run python server.py and access the page at <local_ip>:8080/temperature. Every refresh the page will report temperature from the click. Additionally, the script acts as an HTTP server serving any pages present in the directory.
+Then run python server.py and access the page at local_ip:8080/temperature. Every refresh the page will report temperature from the click. Additionally, the script acts as an HTTP server serving any pages present in the directory.
