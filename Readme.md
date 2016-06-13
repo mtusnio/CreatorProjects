@@ -33,3 +33,7 @@ A simple C application which enables PWM fan control using a joystick
 Python HTTP server which reports temperature read from the Thermo3 click
 
 [Video](https://drive.google.com/file/d/0B2-TjqGUlGKvYkxfVW9fX2tWcGs/view?usp=sharing)
+
+### Snake
+
+A game of snake implemented using a joystick and 8x8 LED display
