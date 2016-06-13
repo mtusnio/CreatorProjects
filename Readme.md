@@ -18,7 +18,7 @@ Check per project requirements.
 2. Run make V=s until the build fails.
 3. Once the build's failed add "libc.so.6" to the end of the following file: "staging_dir/target-mipsel_mips32_musl-1.1.11/pkginfo/libc.provides"
 4. Rerun the build.
-5. Once the image's been flashed create a symbolic link to work around the interpreter not working: ln -s ld-musl-mipsel-sf.so.1 ld-musl-mips.so.1
+5. Once the image's been flashed create a symbolic link to work around the interpreter not working: ln -s /lib/ld-musl-mipsel-sf.so.1 /lib/ld-musl-mips.so.1
 
 ## Projects
 
