@@ -37,3 +37,5 @@ Python HTTP server which reports temperature read from the Thermo3 click
 ### Snake
 
 A game of snake implemented using a joystick and 8x8 LED display
+
+[Video](https://www.youtube.com/watch?v=A7ed3Y3s2E8)
