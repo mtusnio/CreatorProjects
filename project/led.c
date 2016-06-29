@@ -45,6 +45,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pic32_i2c.h>
+#include <p32xxxx.h>
 #include "sys/clock.h"
 #include "dev/leds.h"
 
@@ -55,6 +56,11 @@
 #define X_REG (0x10)
 #define Y_REG (0x11)
 
+#define M_CTRL_REG (0x2B)
+#define J_CTRL_REG (0x2C)
+#define T_CTRL_REG (0x2D)
+
+
 PROCESS(led_process, "LED process");
 AUTOSTART_PROCESSES(&led_process);
 /*---------------------------------------------------------------------------*/
@@ -63,47 +69,93 @@ PROCESS_THREAD(led_process, ev, data)
   PROCESS_BEGIN();
 
   {
-	printf("Start");
 	int i;
-	uint8_t reg_data[2] = { JOYSTICK_ADDRESS_READ, X_REG };
+	uint8_t registers[] = { M_CTRL_REG, J_CTRL_REG, T_CTRL_REG };
+	uint8_t register_bytes[] = { 0x00, 0x06, 0x09 };
 
-//	i2c1_init();
-//	i2c1_set_frequency(100000);
-//	i2c1_master_enable();
+	printf("=====Start=====\n");
+
+	for(i = 0; i < 35; i++)
+		clock_delay_usec(65000);
+
+//	uint8_t reg_data[2] = { JOYSTICK_ADDRESS_READ, X_REG };
+
+	i2c1_init();
+	i2c1_set_frequency(100000);
+	i2c1_master_enable();
+
+	for(i = 0; i < 3; i++)
+	{
+		i2c1_send_start();
+		i2c1_byte_send(JOYSTICK_ADDRESS_WRITE);
+		i2c1_byte_send(registers[i]);
+		i2c1_byte_send(register_bytes[i]);
+		i2c1_send_stop();
+	}
 
 	while(1)
 	{
-		printf("Loop");
-		int8_t x, y;
+		int8_t x = 2;
 //		leds_on(LEDS_RED);
 		for(i = 0; i < 5; i++)
 			clock_delay_usec(65000);
 
-		/*i2c1_send_start();
-		i2c1_byte_send(JOYSTICK_ADDRESS_WRITE);
-		i2c1_byte_send(X_REG);
-		i2c1_send_repeated_start();
-		i2c1_byte_send(JOYSTICK_ADDRESS_READ);
-		i2c1_byte_receive((uint8_t*)&x);
+		if(i2c1_send_start())
+		{
+			printf("Issue when sending start\n");
+			continue;
+		}
+		printf("Start sent\n");
+		if(i2c1_byte_send(JOYSTICK_ADDRESS_WRITE))
+		{
+			printf("Issue when sending write address\n");
+			continue;
+		}
+		printf("Write sent\n");
+		if(i2c1_byte_send(X_REG))
+		{
+			printf("Issue when sending X registry read\n");
+			continue;
+		}
+		printf("X reg sent\n");
 
-		i2c1_send_stop();*/
+		if(i2c1_send_repeated_start())
+		{
+			printf("Issue when sending repeated start\n");
+			continue;
+		}
+		printf("Repeated start\n");
+		if(i2c1_byte_send(JOYSTICK_ADDRESS_READ))
+		{
+			printf("Issue when sending read\n");
+			continue;
+		}
 
-//		if(x > 0)
-//			leds_on(LEDS_RED);
-//		else
-//			leds_off(LEDS_RED);
+		I2C1CONbits.ACKDT = 1;
+		printf("Read sent\n");
+		if(i2c1_byte_receive((uint8_t*)&x))
+		{
+			printf("Issue when receiving a byte\n");
+			continue;
+		}
+		I2C1CONbits.ACKDT = 0;
+		printf("Byte received\n");
+		if(i2c1_send_stop())
+			printf("Failed to send stop\n");
+		printf("Stop sent\n");
 
-//		printf("Test\n");
+
+		printf("X: %i\n", x);
 		leds_toggle(LEDS_RED);
-//		leds_toggle(LEDS_BLUE);
 
 		if(x > 10)
 			leds_on(LEDS_GREEN);
 		else
 			leds_off(LEDS_GREEN);
-	}
-//	i2c1_master_disable();
 
+	}
+
+	i2c1_master_disable();
 
   }
 
