@@ -34,48 +34,6 @@ typedef struct pos_t
 	int y;
 } Pos;
 
-int display_number(int number)
-{
-    int i;
-    int digits[2];
-
-    if(number < 0 || number > 99)
-            return -1;
-
-    uint8_t columns[10][HALF_SIZE] = {
-            { 60, 66, 66, 60 }, // 0
-            { 0, 126, 32, 16 }, // 1
-            { 50, 74, 70, 34 }, // 2
-            { 126, 90, 90, 66 }, // 3
-            { 8, 126, 40, 24 }, // 4
-            { 94, 82, 82, 114 }, // 5
-            { 94, 82, 82, 126}, // 6
-            { 126, 64, 64, 96 }, // 7
-            { 126, 90, 90, 126 }, // 8
-            { 126, 82, 82, 114 }, // 9
-    };
-
-    digits[0] = number / 10;
-    digits[1] = number % 10;
-
-    uint8_t display[SIZE];
-    for(i = 0; i < SIZE; i++)
-            display[i] = 0;
-
-    printf("Printing %i%i", digits[0], digits[1]);
-    for(i = 0; i < HALF_SIZE; i++)
-            display[i] = columns[digits[1]][i];
-
-    for(i = HALF_SIZE; i < SIZE; i++)
-            display[i] = columns[digits[0]][i - HALF_SIZE];
-
-    led_matrix_click_set(display);
-
-    return 0;
-
-}
-
-
 Pos get_random_fruit_position(Pos ** snake, int snake_length)
 {
 	// The naive way of doing it - just randomize until you find a
@@ -280,7 +238,7 @@ int main()
 				nanosleep(&t, 0);
 			}
 
-			display_number(score);
+			led_matrix_click_display_number(score);
 			sleep(5);
 			break;
 		}
