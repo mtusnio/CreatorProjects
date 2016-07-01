@@ -77,8 +77,10 @@ int main()
 
 	srand(time(0));
 
-	if(i2c_init() < 0 || i2c_select_bus(MIKROBUS_1) < 0)
+	if(i2c_init() < 0)
 		return -1;
+
+    i2c_select_bus(MIKROBUS_1);
 
 	if(spi_init(MIKROBUS_2, SPI_MODE_3) < 0)
 		return -1;
