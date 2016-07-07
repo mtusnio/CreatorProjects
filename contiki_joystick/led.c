@@ -50,8 +50,7 @@
 #include "dev/leds.h"
 
 
-#define JOYSTICK_ADDRESS_READ (0x81)
-#define JOYSTICK_ADDRESS_WRITE (0x80)
+#define JOYSTICK_ADDRESS (0x40)
 
 #define X_REG (0x10)
 #define Y_REG (0x11)
@@ -60,6 +59,113 @@
 #define J_CTRL_REG (0x2C)
 #define T_CTRL_REG (0x2D)
 
+
+#define I2C_DEFAULT_FREQUENCY 100000
+
+uint8_t i2c_init()
+{
+    if(i2c1_init())
+        return 1;
+
+    if(i2c1_set_frequency(I2C_DEFAULT_FREQUENCY))
+        return 1;
+
+    if(i2c1_master_enable())
+        return 1;
+
+
+    return 0;
+}
+
+uint8_t i2c_release()
+{
+    return i2c1_master_disable();
+}
+
+uint8_t i2c_set_frequency(uint32_t frequency)
+{
+    return i2c1_set_frequency(frequency);
+}
+
+uint8_t i2c_write(uint8_t address, uint8_t reg_address, uint8_t * bytes, uint8_t length)
+{
+    if(!bytes)
+    {
+        printf("I2C: Cannot write null bytes\n");
+        return 1;
+    }
+
+    if(!length)
+    {
+        printf("I2C: Length cannot be 0\n");
+        return 1;
+    }
+
+    address = (address << 1);
+
+    if(i2c1_send_start())
+        return 1;
+
+	if(i2c1_send_byte(address))
+        return 1;
+
+    if(i2c1_send_byte(reg_address))
+        return 1;
+
+    if(i2c1_send_bytes(bytes, length))
+        return 1;
+
+    if(i2c1_send_stop())
+        return 1;
+
+    return 0;
+}
+
+uint8_t i2c_read(uint8_t address, uint8_t reg_address, uint8_t * bytes, uint8_t length)
+{
+    if(!bytes)
+    {
+        printf("I2C: Cannot read to null bytes\n");
+        return 1;
+    }
+
+    if(!length)
+    {
+        printf("I2C: Length cannot be 0\n");
+        return 1;
+    }
+
+
+    address = address << 1;
+
+  	if(i2c1_send_start())
+        return 1;
+
+	if(i2c1_send_byte(address))
+        return 1;
+
+    if(i2c1_send_byte(reg_address))
+        return 1;
+
+    if(i2c1_send_repeated_start())
+        return 1;
+
+    address |= 0x01;
+
+    if(i2c1_send_byte(address))
+        return 1;
+
+    if(i2c1_set_nack(1))
+        return 1;
+
+    if(i2c1_receive_bytes(bytes, length))
+        return 1;
+
+    if(i2c1_send_stop())
+        return 1;
+
+    return 0;
+}
 
 PROCESS(led_process, "LED process");
 AUTOSTART_PROCESSES(&led_process);
@@ -70,82 +176,27 @@ PROCESS_THREAD(led_process, ev, data)
 
   {
 	int i;
-	uint8_t registers[] = { M_CTRL_REG, J_CTRL_REG, T_CTRL_REG };
-	uint8_t register_bytes[] = { 0x00, 0x06, 0x09 };
 
 	printf("=====Start=====\n");
 
-	for(i = 0; i < 35; i++)
-		clock_delay_usec(65000);
 
-//	uint8_t reg_data[2] = { JOYSTICK_ADDRESS_READ, X_REG };
-
-	i2c1_init();
-	i2c1_set_frequency(100000);
-	i2c1_master_enable();
-
-	for(i = 0; i < 3; i++)
-	{
-		i2c1_send_start();
-		i2c1_byte_send(JOYSTICK_ADDRESS_WRITE);
-		i2c1_byte_send(registers[i]);
-		i2c1_byte_send(register_bytes[i]);
-		i2c1_send_stop();
-	}
+    i2c_init();
 
 	while(1)
 	{
 		int8_t x = 2;
+        int8_t y = 2;
 //		leds_on(LEDS_RED);
-		for(i = 0; i < 5; i++)
+		for(i = 0; i < 8; i++)
 			clock_delay_usec(65000);
 
-		if(i2c1_send_start())
-		{
-			printf("Issue when sending start\n");
-			continue;
-		}
-		printf("Start sent\n");
-		if(i2c1_byte_send(JOYSTICK_ADDRESS_WRITE))
-		{
-			printf("Issue when sending write address\n");
-			continue;
-		}
-		printf("Write sent\n");
-		if(i2c1_byte_send(X_REG))
-		{
-			printf("Issue when sending X registry read\n");
-			continue;
-		}
-		printf("X reg sent\n");
+        printf("Read X\n");
+        i2c_read(JOYSTICK_ADDRESS, X_REG, (uint8_t*)&x, 1);
+        printf("Read Y\n");
+        i2c_read(JOYSTICK_ADDRESS, Y_REG, (uint8_t*)&y, 1);
 
-		if(i2c1_send_repeated_start())
-		{
-			printf("Issue when sending repeated start\n");
-			continue;
-		}
-		printf("Repeated start\n");
-		if(i2c1_byte_send(JOYSTICK_ADDRESS_READ))
-		{
-			printf("Issue when sending read\n");
-			continue;
-		}
+        printf("X: %i, Y: %i\n", x, y);
 
-		I2C1CONbits.ACKDT = 1;
-		printf("Read sent\n");
-		if(i2c1_byte_receive((uint8_t*)&x))
-		{
-			printf("Issue when receiving a byte\n");
-			continue;
-		}
-		I2C1CONbits.ACKDT = 0;
-		printf("Byte received\n");
-		if(i2c1_send_stop())
-			printf("Failed to send stop\n");
-		printf("Stop sent\n");
-
-
-		printf("X: %i\n", x);
 		leds_toggle(LEDS_RED);
 
 		if(x > 10)
@@ -155,7 +206,7 @@ PROCESS_THREAD(led_process, ev, data)
 
 	}
 
-	i2c1_master_disable();
+	i2c_release();
 
   }
 
