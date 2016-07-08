@@ -106,7 +106,7 @@ uint8_t i2c_write(uint8_t address, uint8_t reg_address, uint8_t * bytes, uint8_t
     if(i2c1_send_start())
         return 1;
 
-	if(i2c1_send_byte(address))
+    if(i2c1_send_byte(address))
         return 1;
 
     if(i2c1_send_byte(reg_address))
@@ -138,10 +138,10 @@ uint8_t i2c_read(uint8_t address, uint8_t reg_address, uint8_t * bytes, uint8_t 
 
     address = address << 1;
 
-  	if(i2c1_send_start())
+    if(i2c1_send_start())
         return 1;
 
-	if(i2c1_send_byte(address))
+    if(i2c1_send_byte(address))
         return 1;
 
     if(i2c1_send_byte(reg_address))
@@ -172,45 +172,45 @@ AUTOSTART_PROCESSES(&led_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(led_process, ev, data)
 {
-  PROCESS_BEGIN();
+    PROCESS_BEGIN();
 
-  {
-	int i;
+    {
+        int i;
 
-	printf("=====Start=====\n");
+        printf("=====Start=====\n");
 
 
-    i2c_init();
+        i2c_init();
 
-	while(1)
-	{
-		int8_t x = 2;
-        int8_t y = 2;
-//		leds_on(LEDS_RED);
-		for(i = 0; i < 8; i++)
-			clock_delay_usec(65000);
+        while(1)
+        {
+            int8_t x = 2;
+            int8_t y = 2;
+//          leds_on(LEDS_RED);
+            for(i = 0; i < 8; i++)
+                    clock_delay_usec(65000);
 
-        printf("Read X\n");
-        i2c_read(JOYSTICK_ADDRESS, X_REG, (uint8_t*)&x, 1);
-        printf("Read Y\n");
-        i2c_read(JOYSTICK_ADDRESS, Y_REG, (uint8_t*)&y, 1);
+            printf("Read X\n");
+            i2c_read(JOYSTICK_ADDRESS, X_REG, (uint8_t*)&x, 1);
+            printf("Read Y\n");
+            i2c_read(JOYSTICK_ADDRESS, Y_REG, (uint8_t*)&y, 1);
 
-        printf("X: %i, Y: %i\n", x, y);
+            printf("X: %i, Y: %i\n", x, y);
 
-		leds_toggle(LEDS_RED);
+            leds_toggle(LEDS_RED);
 
-		if(x > 10)
-			leds_on(LEDS_GREEN);
-		else
-			leds_off(LEDS_GREEN);
+            if(x > 10)
+                leds_on(LEDS_GREEN);
+            else
+                leds_off(LEDS_GREEN);
 
-	}
+        }
 
-	i2c_release();
+        i2c_release();
 
-  }
+    }
 
-  PROCESS_END();
+    PROCESS_END();
 }
 
 /*---------------------------------------------------------------------------*/
