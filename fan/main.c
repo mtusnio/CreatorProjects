@@ -1,43 +1,51 @@
 #include <stdio.h>
-#include <core/common.h>
-#include <core/led.h>
-#include <core/i2c.h>
-#include <click/joystick.h>
+#include <unistd.h>
 
-#define OFFSET 98
-#define MAXIMUM (OFFSET * 2)
+#include "core/i2c.h"
+#include "click/common.h"
 
-int resolve_percentage(float perc)
-{
-    int mask = 0;
-    int div = perc/0.14f;
+#define FAN_ADDRESS (0x2F)
 
-    for(int i = 0; i < div; i++)
-        mask |= (1 << i);
+#define STATUS_REGISTER (0x24)
+#define FREQUENCY_REGISTER (0x2D)
+#define SETTING_REGISTER (0x30)
+#define CONFIGURATION_REGISTER (0x32)
 
-    return mask;
-}
 
 int main()
 {
-    i2c_init(MIKROBUS_2);
-    i2c_select_bus(MIKROBUS_2);
-    led_init();
+    i2c_init(MIKROBUS_I2C_BUS_1);
+    i2c_select_bus(MIKROBUS_I2C_BUS_1);
+    
+    uint8_t currentspeed = 0;
     while(1)
     {
-        int8_t x, y;
-        int mask;
+//        sleep(5);
+ 
+//        if(i2c_write_register(FAN_ADDRESS, SETTING_REGISTER, 0x01) == -1)        
+//            return -1;
 
-        joystick_click_get_position(&x, &y);
-        printf("%i %i\n", (int)x, (int)y);
+        uint8_t status, frequency, speed;
 
-        mask = resolve_percentage((float)(x + OFFSET)/(float)MAXIMUM);
-        led_switch_on(mask);
-        led_switch_off(~mask);
+
+	printf("1\n");
+        if(i2c_read_register(FAN_ADDRESS, STATUS_REGISTER, &status) == -1)
+           return -1;
+        
+	printf("2\n");
+	if(i2c_read_register(FAN_ADDRESS, FREQUENCY_REGISTER, (uint8_t*)&frequency) == -1)
+            return -1;
+
+
+	printf("3\n");        
+        if(i2c_read_register(FAN_ADDRESS, CONFIGURATION_REGISTER, (uint8_t*)&speed) == -1)
+            return -1;
+
+        printf("%i %i %i\n", status, frequency, speed);
+
+        currentspeed += 30;
     }
-
-    led_release();
-    i2c_release(MIKROBUS_2);
+    i2c_release(MIKROBUS_I2C_BUS_1);
 
     return 0;
 }
