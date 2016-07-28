@@ -1,6 +1,9 @@
-CONTIKI=../../../../
+CONTIKI=../../contiki/
 
 TARGET = mikro-e
+USE_CA8210 = 1
+CONTIKI_WITH_IPV6 = 1
+
 VERSION? = $(shell git describe --abbrev=4 --dirty --always --tags)
 
 CFLAGS += -DVERSION=$(VERSION)
@@ -9,7 +12,6 @@ CFLAGS += -I $(CONTIKI)/platform/$(TARGET)
 CFLAGS += -fno-short-double
 LDFLAGS += -Wl,--defsym,_min_heap_size=32000
 
-CONTIKI_WITH_IPV6 = 1
 SMALL=0
 
 all: main
