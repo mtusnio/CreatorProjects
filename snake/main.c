@@ -5,11 +5,11 @@
 #include <linux/spi/spidev.h>
 #include <math.h>
 
-#include <core/common.h>
-#include <core/i2c.h>
-#include <click/common.h>
-#include <click/joystick.h>
-#include <click/led_matrix.h>
+#include <letmecreate/core/common.h>
+#include <letmecreate/core/i2c.h>
+#include <letmecreate/click/common.h>
+#include <letmecreate/click/joystick.h>
+#include <letmecreate/click/led_matrix.h>
 
 #define GAME_SPEED 480000000
 
