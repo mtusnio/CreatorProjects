@@ -22,11 +22,9 @@ Check per project requirements.
 
 ## Projects
 
-### Fan
+### Camera
 
-A simple C application which enables PWM fan control using a joystick
-
-[Video](https://drive.google.com/file/d/0B2-TjqGUlGKvSmNfLUF5TjRaNDQ/view?usp=sharing)
+A work in progress project aimed at utilising the Camera Click
 
 ### Temperature server
 
@@ -39,3 +37,8 @@ Python HTTP server which reports temperature read from the Thermo3 click
 A game of snake implemented using a joystick and 8x8 LED display
 
 [Video](https://www.youtube.com/watch?v=BmwKbkzw464)
+
+### Tweeting sensors
+
+Python server which actively [tweets](https://twitter.com/BigBrotherKit) temperature and any activation by the motion sensors.
+
