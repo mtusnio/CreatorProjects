@@ -36,8 +36,6 @@ def process_data(id, val):
 
 while True:
     data, address = sock.recvfrom(2)
-    for i in range(0, 3):
-        sock.recvfrom(2)
     print("Received", data)
     # Decode the client data
     try:
